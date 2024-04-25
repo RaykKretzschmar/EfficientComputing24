@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
     // Measure execution time
     clock_t start_time = clock();
 
+    // Transpose matrix A
+    transpose_matrix(A, n);
+
     // Compute matrix-vector product: y = Ax
     matrix_vector_product(A, x, y, n);
 
