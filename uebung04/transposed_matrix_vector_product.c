@@ -40,20 +40,6 @@ void initialize_vector(double *vector, int n)
     }
 }
 
-// Function to transpose a matrix
-void transpose_matrix(double **A, int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = i + 1; j < n; j++)
-        {
-            double temp = A[i][j];
-            A[i][j] = A[j][i];
-            A[j][i] = temp;
-        }
-    }
-}
-
 // Function to compute matrix-vector product: y = Ax
 void matrix_vector_product(double **A, double *x, double *y, int n)
 {
@@ -63,6 +49,19 @@ void matrix_vector_product(double **A, double *x, double *y, int n)
         for (int j = 0; j < n; j++)
         {
             y[i] += A[i][j] * x[j];
+        }
+    }
+}
+
+// Function to compute the transpose matrix vector product y = A^T x
+void transpose_matrix_vector_product(double **A, double *x, double *y, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        y[i] = 0.0;
+        for (int j = 0; j < n; j++)
+        {
+            y[i] += A[j][i] * x[j];
         }
     }
 }
@@ -93,16 +92,24 @@ int main(int argc, char *argv[])
     clock_t start_time = clock();
 
     // Transpose matrix A
-    transpose_matrix(A, n);
-
-    // Compute matrix-vector product: y = Ax
-    matrix_vector_product(A, x, y, n);
+    transpose_matrix_vector_product(A, x, y, n);
 
     clock_t end_time = clock();
     double execution_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
 
     printf("Matrix size (n): %d x %d\n", n, n);
+    printf("mit Transponierter Matrix: \n");
     printf("Execution time: %.6f seconds\n", execution_time);
+
+    clock_t start_time2 = clock();
+
+    matrix_vector_product(A, x, y, n);
+
+    clock_t end_time2 = clock();
+    double execution_time2 = ((double)(end_time2 - start_time2)) / CLOCKS_PER_SEC;
+
+    printf("ohne Transponierte Matrix: \n");
+    printf("Execution time: %.6f seconds\n", execution_time2);
 
     // Free allocated memory
     for (int i = 0; i < n; i++)
