@@ -1,8 +1,12 @@
+Contributors:
 Rayk Kretzschmar
 Bohdan Babii
 
 - Programm compilieren und dann mit einem Argument für i ausführen
-- Das Programm erstellt einen Vektor mit Länge n = 1024 * i und eine Matrix mit der Größe nXn und führt eine Matrix-Vektor-Multiplikation durch mit randomisierten Werten.
+- Das Programm erstellt einen Vektor mit Länge n = 1024 * i und eine 
+Matrix mit der Größe nXn und führt eine reguläre Matrix-Vektor-Multiplikation 
+sowie eine Transponierte-Matrix-Vektor-Multiplikation durch mit randomisierten 
+Werten und misst dabei die Zeit für beide Berechnungen und gibt diese aus.
 
 i = 1
 Matrix size (n): 1024 x 1024
