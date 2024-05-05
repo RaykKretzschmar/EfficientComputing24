@@ -1,0 +1,23 @@
+c++, row-oriented scalar multiplication,5957627
+c++, column-oriented scalar multiplication,6471164
+c++, blocked multiplication with block size 50,9043925
+c++, blocked multiplication with block size 100,8715700
+c++, blocked multiplication with block size 150,8671556
+c++, blocked multiplication with block size 200,8660316
+c++, blocked multiplication with block size 250,9449549
+c++, blocked multiplication with block size 300,8757868
+c++, blocked multiplication with block size 350,8642317
+c++, blocked multiplication with block size 400,8674144
+c++, blocked multiplication with block size 450,8722092
+c++, blocked multiplication with block size 500,8592587
+c++, blocked multiplication with block size 550,8597481
+c++, blocked multiplication with block size 600,8640318
+c++, blocked multiplication with block size 650,8622773
+c++, blocked multiplication with block size 700,8618986
+c++, blocked multiplication with block size 750,8616683
+c++, blocked multiplication with block size 800,8639033
+c++, blocked multiplication with block size 850,8621661
+c++, blocked multiplication with block size 900,8663847
+c++, blocked multiplication with block size 950,9015519
+c++, blocked multiplication with block size 1000,8915427
+"python, row-oriented scalar multiplication",100654880.04103088
