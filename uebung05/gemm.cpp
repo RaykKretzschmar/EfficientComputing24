@@ -1,76 +1,58 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <chrono>
+#include <cstdlib>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <vector>
 
-// Function to allocate memory for a matrix
-double **allocate_matrix(int n)
-{
-    double **matrix = (double **)malloc(n * sizeof(double *));
-    for (int i = 0; i < n; i++)
-    {
-        matrix[i] = (double *)malloc(n * sizeof(double));
-    }
-    return matrix;
-}
+using namespace std;
+using namespace std::chrono;
 
-// Function to initialize a matrix with random values
-void initialize_matrix(double **matrix, int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            matrix[i][j] = (double)rand() / RAND_MAX; // Random value between 0 and 1
+// Helper function to generate random matrices
+void generate_random_matrix(vector<vector<float>>& matrix, int size) {
+    matrix.clear();
+    matrix.resize(size, vector<float>(size));
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            matrix[i][j] = static_cast<float>(rand()) / RAND_MAX;
         }
     }
 }
 
-// Function to compute row oriented gemm operation Z = Z + X * Y
-void row_oriented_gemm(double **X, double **Y, double **Z, int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            for (int k = 0; k < n; k++)
-            {
-                Z[i][j] = Z[i][j] + X[i][k] * Y[k][j];
+// Row-oriented Scalar algorithm
+void gemm_scalar(vector<vector<float>>& Z, const vector<vector<float>>& X, const vector<vector<float>>& Y) {
+    int n = X.size();
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            for (int k = 0; k < n; ++k) {
+                Z[i][j] += X[i][k] * Y[k][j];
             }
         }
     }
 }
 
-// Function to compute column oriented gemm operation Z = Z + X * Y
-void column_oriented_gemm(double **X, double **Y, double **Z, int n)
-{
-    for (int j = 0; j < n; j++)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            for (int k = 0; k < n; k++)
-            {
-                Z[i][j] = Z[i][j] + X[i][k] * Y[k][j];
+// Column-oriented scalar algorithm
+void gemm_col_scalar(vector<vector<float>>& Z, const vector<vector<float>>& X, const vector<vector<float>>& Y) {
+    int n = X.size();
+    for (int j = 0; j < n; ++j) {
+        for (int k = 0; k < n; ++k) {
+            for (int i = 0; i < n; ++i) {
+                Z[i][j] += X[i][k] * Y[k][j];
             }
         }
     }
 }
 
-// Function to compute blocked gemm operation Z = Z + X * Y
-void blocked_gemm(double **X, double **Y, double **Z, int n, int s)
-{
-    for (int i0 = 0; i0 < n; i0 += s)
-    {
-        for (int j0 = 0; j0 < n; j0 += s)
-        {
-            for (int k0 = 0; k0 < n; k0 += s)
-            {
-                for (int i = i0; i < i0 + s; i++)
-                {
-                    for (int j = j0; j < j0 + s; j++)
-                    {
-                        for (int k = k0; k < k0 + s; k++)
-                        {
-                            Z[i][j] = Z[i][j] + X[i][k] * Y[k][j];
+// Blocked algorithm
+void gemm_blocked(vector<vector<float>>& Z, const vector<vector<float>>& X, const vector<vector<float>>& Y, int blockSize) {
+    int n = X.size();
+    for (int i0 = 0; i0 < n; i0 += blockSize) {
+        for (int j0 = 0; j0 < n; j0 += blockSize) {
+            for (int k0 = 0; k0 < n; k0 += blockSize) {
+                for (int i = i0; i < min(i0 + blockSize, n); ++i) {
+                    for (int j = j0; j < min(j0 + blockSize, n); ++j) {
+                        for (int k = k0; k < min(k0 + blockSize, n); ++k) {
+                            Z[i][j] += X[i][k] * Y[k][j];
                         }
                     }
                 }
@@ -79,77 +61,47 @@ void blocked_gemm(double **X, double **Y, double **Z, int n, int s)
     }
 }
 
-int main(int argc, char *argv[])
-{
-    if (argc != 2)
-    {
-        printf("Usage: ./matrix_vector_product <i>\n");
+void measure_and_print_duration(ofstream& outfile, function<void()> func, const string& description) {
+    auto start = high_resolution_clock::now();
+    func();
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    outfile << description << "," << duration.count() << endl;
+}
+
+int main() {
+    srand(time(NULL));
+    int n = 1000;  // Size of the matrix
+
+    vector<vector<float>> X, Y, Z;
+    generate_random_matrix(X, n);
+    generate_random_matrix(Y, n);
+
+    ofstream outfile("output.csv");
+    if (!outfile.is_open()) {
+        cerr << "Error: Unable to open output.csv" << endl;
         return 1;
     }
 
-    int i = atoi(argv[1]);
-    int n = i;
-    int s = 32;
+    // Row-oriented multiplication (using scalar as row-oriented is similar in this case)
+    generate_random_matrix(Z, n);  // Reset Z
+    measure_and_print_duration(
+        outfile, [&]() { gemm_scalar(Z, X, Y); }, "c++, row-oriented scalar multiplication");
 
-    srand(time(NULL)); // Seed random number generator
+    // Column-oriented multiplication
+    generate_random_matrix(Z, n);  // Reset Z
+    measure_and_print_duration(
+        outfile, [&]() { gemm_col_scalar(Z, X, Y); }, "c++, column-oriented scalar multiplication");
 
-    // Allocate memory for matrix A, vector x, and result vector y
-    double **X = allocate_matrix(n);
-    double **Y = allocate_matrix(n);
-    double **Z = allocate_matrix(n);
-
-    // Initialize matrix A and vector x with random values
-    initialize_matrix(X, n);
-    initialize_matrix(Y, n);
-    initialize_matrix(Z, n);
-
-    // Measure execution time
-    clock_t start_time = clock();
-
-    // gemm operation
-    row_oriented_gemm(X, Y, Z, n);
-
-    clock_t end_time = clock();
-    double execution_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
-    printf("Matrix size (n): %d x %d\n", n, n);
-    printf("row_oriented_gemm: \n");
-    printf("Execution time: %.6f seconds\n", execution_time);
-
-    // Measure execution time
-    start_time = clock();
-
-    // gemm operation
-    column_oriented_gemm(X, Y, Z, n);
-
-    end_time = clock();
-    execution_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
-    printf("column_oriented_gemm: \n");
-    printf("Execution time: %.6f seconds\n", execution_time);
-
-    // Measure execution time
-    start_time = clock();
-
-    // gemm operation
-    blocked_gemm(X, Y, Z, n, s);
-
-    end_time = clock();
-    execution_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
-    printf("blocked_gemm: \n");
-    printf("Execution time: %.6f seconds\n", execution_time);
-
-    // Free allocated memory
-    for (int i = 0; i < n; i++)
-    {
-        free(X[i]);
-        free(Y[i]);
-        free(Z[i]);
+    // Blocked multiplication
+    int blockSize = 50;  // initial block size
+    while (blockSize <= n) {
+        generate_random_matrix(Z, n);  // Reset Z
+        measure_and_print_duration(
+            outfile, [&]() { gemm_blocked(Z, X, Y, blockSize); }, "c++, blocked multiplication with block size " + to_string(blockSize));
+        // Increase block size
+        blockSize += 50;
     }
-    free(X);
-    free(Y);
-    free(Z);
-
+    outfile.close();
     return 0;
 }

@@ -1,30 +1,33 @@
+import csv
 import numpy as np
-import time
-import sys
+from time import time
 
-
-def scalar_gemm(X, Y, Z):
+# Row-oriented scalar algorithm
+def gemm_row_scalar(Z, X, Y):
+    n = len(X)
     for i in range(n):
         for j in range(n):
             for k in range(n):
-                Z[i, j] = Z[i, j] + X[i, k] * Y[k, j]
+                Z[i][j] += X[i][k] * Y[k][j]
 
+def generate_random_matrix(size):
+    return np.random.rand(size, size).tolist()
 
-# n from arguments
-n = int(sys.argv[1])
+def main():
+    n = 1000  # Size of the matrix
+    X = generate_random_matrix(n)
+    Y = generate_random_matrix(n)
+    Z = [[0 for _ in range(n)] for _ in range(n)]  # Result matrix
 
-print("n = ", n)
+    start = time()
+    gemm_row_scalar(Z, X, Y)
+    end = time()
 
-X = np.random.rand(n, n)
-Y = np.random.rand(n, n)
-Z = np.random.rand(n, n)
+    duration = (end - start) * 1e6  # in microseconds
 
-# measure start time
-start_time = time.time()
+    with open('output.csv', 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['python, row-oriented scalar multiplication', duration])
 
-scalar_gemm(X, Y, Z)
-
-# measure end time
-end_time = time.time()
-
-print("Elapsed time: ", end_time - start_time, "s")
+if __name__ == "__main__":
+    main()
