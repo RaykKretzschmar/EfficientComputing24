@@ -1,6 +1,11 @@
+Übung 05
+
 Contributors:
 Rayk Kretzschmar
 Bohdan Babii
+
+Compile the gemm.cpp and run the executable. The program will write the time measurements in output.csv.
+Then run 'python gemm.py'. This will add the time measurement for the python code to the output.csv.
 
 Ratios:
 Python (Scalar) vs. Fastest C++ (Row-Oriented) :
