@@ -38,7 +38,7 @@ für p=1, 2 und infinity jeweils einmal laufen lassen.
 
 In der Visualisierung können die Unterschiede angesehen werden.
 
-Bei größeren Vektorgrößen (ab n ≥ 100000) zeigen parallele Berechnungen signifikante 
+Bei größeren Vektorgrößen (ab n >= 100000) zeigen parallele Berechnungen signifikante 
 Leistungsverbesserungen. Mit zunehmender Anzahl von Threads nähern sich die tatsächlichen 
 Geschwindigkeitssteigerungen den idealen theoretischen Geschwindigkeitssteigerungen an. 
 Dieser Trend ist besonders bei einer höheren Anzahl von Threads deutlich. Allerdings 
