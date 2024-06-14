@@ -1,0 +1,49 @@
+Excercise 11.3
+
+a)
+S(n;p) = T(n;1) / T(n;p)
+
+T(n;p) = T_ser(n) + T_par(n)/p + T_over(n;p)
+
+S(n;p) = (T_ser(n) + T_par(n) + T_over(n;1)) / (T_ser(n) + T_par(n)/p + T_over(n;p))
+
+T_over​(n;1) ≈ T_over(n;p)
+
+--> S(n;p) ≈ (T_ser(n) + T_par(n) + T_over(n;p)) / (T_ser(n) + T_par(n)/p + T_over(n;p))
+
+f ≈ ((T_ser(n) + T_over(n;p))) / T(n;1)
+
+--> T_ser(n) + T_over(n;p) ≈ f * T(n;1)
+
+S(n;p) ≈ T(n;1) / (f * T(n;1) + T_par(n)/p)
+
+T_par(n) = (1-f) * T(n;1)
+
+--> S(n;p) = T(n;1) / (f * T(n;1) + (1-f) * T(n;1) / p)
+
+--> S(n;p) ≈ 1 / (f + (1-f)/p)
+
+--> S(n;p) * (f + (1-f)/p) ≈ 1
+
+--> f + (1-f)/p ≈ 1/S(n;p)
+
+--> p * f + 1 - f ≈ p / S(n;p)
+
+--> p * f - f ≈ p / S(n;p) - 1
+
+--> (p - 1) * f ≈ p / S(n;p) - 1
+
+--> f ≈ (p / S(n;p) - 1) / (p - 1)
+
+--> f ≈ (1 / (p - 1)) * (p / S(n;p) - 1)
+
+
+b)
+
+The serial fraction f represents the proportion of the total computation time
+that is sequential and cannot be parallelized. It quantifies the limit on speedup 
+due to the sequential portion of the computation. Even with an infinite number of 
+processors, the speedup is limited by f. As f approaches 0, the potential speedup 
+increases, indicating that most of the computation can be parallelized. Conversely, 
+as f increases, the maximum achievable speedup decreases, indicating a larger portion 
+of the computation is sequential.
